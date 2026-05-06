@@ -942,11 +942,18 @@ function getMainHTML() {
         }
 
         function enterFullscreen() {
-            const el = frameContainer;
-            if (el.requestFullscreen) el.requestFullscreen();
-            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
-            else if (el.msRequestFullscreen) el.msRequestFullscreen();
+            // Send message to the injected script inside the iframe so it can
+            // fullscreen #gameWrapper (the actual game element) via the Fullscreen API.
+            // Fall back to fullscreening the outer frame container if no iframe is ready.
+            if (currentIframe && currentIframe.contentWindow) {
+                currentIframe.contentWindow.postMessage({ type: 'REQUEST_FULLSCREEN' }, window.location.origin);
+            } else {
+                const el = frameContainer;
+                if (el.requestFullscreen) el.requestFullscreen();
+                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+                else if (el.msRequestFullscreen) el.msRequestFullscreen();
+            }
         }
         
         console.log('%c CloudMoon Proxy Active with Ad Blocking', 'color: #667eea; font-size: 18px; font-weight: bold;');
