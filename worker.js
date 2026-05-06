@@ -92,6 +92,22 @@ async function handleRequest(request) {
       headers: iconHeaders
     });
   }
+
+  // Serve PWA icon — Google Classroom product logo SVG (resolution-independent)
+  if (url.pathname === '/icon.svg') {
+    let iconRes = await fetch('https://fonts.gstatic.com/s/i/productlogos/classroom/v8/192px.svg');
+    if (!iconRes.ok) {
+      // Fallback to the standard favicon if the versioned SVG is unavailable
+      iconRes = await fetch('https://ssl.gstatic.com/classroom/favicon.png');
+    }
+    const iconHeaders = new Headers(iconRes.headers);
+    iconHeaders.set('Content-Type', 'image/svg+xml');
+    iconHeaders.set('Cache-Control', 'public, max-age=86400');
+    return new Response(iconRes.body, {
+      status: iconRes.status,
+      headers: iconHeaders
+    });
+  }
   
   // Proxy everything else to CloudMoon
   return proxyCloudMoon(request);
@@ -954,15 +970,9 @@ function getManifest() {
     
     "icons": [
       {
-        "src": "/favicon.png",
-        "sizes": "192x192",
-        "type": "image/png",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "/favicon.png",
-        "sizes": "512x512",
-        "type": "image/png",
+        "src": "/icon.svg",
+        "sizes": "any",
+        "type": "image/svg+xml",
         "purpose": "any maskable"
       }
     ],
@@ -988,7 +998,8 @@ self.addEventListener('install', (event) => {
         '/',
         '/manifest.json',
         '/sw.js',
-        '/favicon.png'
+        '/favicon.png',
+        '/icon.svg'
       ]);
     }).then(() => {
       return self.skipWaiting();
