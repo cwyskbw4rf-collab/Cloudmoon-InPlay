@@ -942,21 +942,12 @@ function getMainHTML() {
         }
 
         function enterFullscreen() {
-            const el = document.documentElement;
+            const el = frameContainer;
             if (el.requestFullscreen) el.requestFullscreen();
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
             else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
             else if (el.msRequestFullscreen) el.msRequestFullscreen();
-            // Hide the dock while fullscreen
-            btnDock.classList.add('hidden');
         }
-
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                // Restore dock when exiting fullscreen
-                btnDock.classList.remove('hidden');
-            }
-        });
         
         console.log('%c CloudMoon Proxy Active with Ad Blocking', 'color: #667eea; font-size: 18px; font-weight: bold;');
         console.log(\`%c Multi-Layer Shadow DOM Protection: \${SHADOW_LAYERS} Layers\`, 'color: #10b981; font-size: 14px; font-weight: bold;');
@@ -1042,13 +1033,25 @@ function getManifest() {
         "src": "/icon-192.png",
         "sizes": "192x192",
         "type": "image/png",
-        "purpose": "any maskable"
+        "purpose": "any"
+      },
+      {
+        "src": "/icon-192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "maskable"
       },
       {
         "src": "/icon-512.png",
         "sizes": "512x512",
         "type": "image/png",
-        "purpose": "any maskable"
+        "purpose": "any"
+      },
+      {
+        "src": "/icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable"
       },
       {
         "src": "/icon.svg",
@@ -1073,18 +1076,21 @@ const RUNTIME_CACHE = 'cloudmoon-runtime-v3';
 self.addEventListener('install', (event) => {
   console.log('[ServiceWorker] Install');
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
+    caches.open(CACHE_NAME).then(async (cache) => {
       console.log('[ServiceWorker] Caching app shell');
-      return cache.addAll([
-        '/',
-        '/manifest.json',
-        '/sw.js',
-        '/favicon.png',
-        '/icon.svg',
-        '/icon-192.png',
-        '/icon-512.png'
-      ]);
-    }).then(() => {
+      // Cache critical resources; skip optional ones that may fail (e.g. proxied icons)
+      const critical = ['/', '/manifest.json', '/sw.js'];
+      const optional = ['/favicon.png', '/icon.svg', '/icon-192.png', '/icon-512.png'];
+      await cache.addAll(critical);
+      await Promise.allSettled(
+        optional.map(url =>
+          fetch(url).then(res => {
+            if (res && res.status === 200) return cache.put(url, res);
+          }).catch((err) => {
+            console.log('[ServiceWorker] Optional resource not cached:', url, err);
+          })
+        )
+      );
       return self.skipWaiting();
     })
   );
