@@ -8,7 +8,7 @@ Cloudmoon InPlay is a simple JS site that proxies, hides, and loads Cloudmoon in
 > [!NOTE]
 > If you fork or use this repository, Please consider sharing or giving us a Star!
 
-## Deploy
+## Deployment Steps
 
 To deploy your own Cloudmoon InPlay Cloudflare worker, click the deploy to Cloudflare button, and then play through the workers preview! 
 
@@ -19,6 +19,8 @@ Or use our official Site/ Deployment at: https://google-classroom.sriail.workers
 
 > [!TIP]
 > Be Shure to share it with your Friends / Co-workers. If you're worried about the url being blocked, Deploy a new worker or create a mirror using the code below on a html site host like Codesandbox of Github pages! Also has a bypass to chrome extension and AI autoblock software (blocks extensions at the root).
+
+## Optional 2-Layer Proxy Steps
 
 Optional second DOM Embed layer (Recommended if under heavy restrictions, to use on a different HTML site with your original worker URL)
 
@@ -216,7 +218,7 @@ Optional second DOM Embed layer (Recommended if under heavy restrictions, to use
 </html>
 ```
 
-## Usage
+## Usage Instructions
 
 > [!IMPORTANT]
 > Because of google's authentication policies, the google sign in button will NOT WORK. You must hit sign in with email and password instead. You will also need to register your cloudmoon account at home with google and set a password in settings before using elsewhere (Google Sign In button is now visibly hidden to avoid confusion).
@@ -228,7 +230,7 @@ After that, you can use the Control bar for navigation, and go home using the ho
 > [!NOTE]
 > When Cloudmoon tries to open a new Tab, it will open in the central iframe to avoid being blocked, keeping everything self contained in the site.
 
-## Updates / Bug Fixes
+## Updates / Bug Fixes In Roadmap
 
 - [x] Fix Proxy Reinizulaiztion
 - [x] Add Fullscreen Fix
